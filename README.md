@@ -22,6 +22,6 @@ node app.js
 ```
 
 ### Rotas
-#[GET] /api/:id/estados
-#[GET] /api/:id/estados/csv
-#[GET] /api/estados/csv
+# [GET] /api/:id/estados
+# [GET] /api/:id/estados/csv
+# [GET] /api/estados/csv

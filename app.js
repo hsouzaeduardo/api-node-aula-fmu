@@ -10,14 +10,14 @@ app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
 
-app.get('/:id/estados', (req, res) => {
+app.get('/api/:id/estados', (req, res) => {
     const id = req.params.id;
     const ordem = req.headers.ordem || 'desc';
     const estados = getEstadosPorRegiao(id, ordem);
     res.json(estados);
   });
 
-  app.get('/:id/csv', async (req, res) => {
+  app.get('/api/:id/csv', async (req, res) => {
     const id = req.params.id;
     const estados = getEstadosPorRegiao(id); 
     const csvWriter = createCsvWriter({
@@ -32,6 +32,21 @@ app.get('/:id/estados', (req, res) => {
     res.download('out.csv');
   });
 
+  app.get('/api/csv', async (req, res) => {
+    
+    const estados = getEstadosPorRegiao(null); 
+    const csvWriter = createCsvWriter({
+      path: 'out.csv',
+      header: [
+        {id: 'nome', title: 'Nome'},
+        {id: 'codigo', title: 'Codigo'}
+      ]
+    });
+    
+    await csvWriter.writeRecords(estados); // retorna uma promise
+    res.download('out.csv');
+  });
+
   function getEstadosPorRegiao(id, ordem = 'asc') {
     const regioes = {
       '1': [{ nome: 'Acre', codigo: 'AC' }, { nome: 'Amapá', codigo: 'AP' }, { nome: 'Amazonas', codigo: 'AM' }, { nome: 'Pará', codigo: 'PA' }, { nome: 'Rondônia', codigo: 'RO' }, { nome: 'Roraima', codigo: 'RR' }, { nome: 'Tocantins', codigo: 'TO' }],
@@ -41,7 +56,7 @@ app.get('/:id/estados', (req, res) => {
       '5': [{ nome: 'Paraná', codigo: 'PR' }, { nome: 'Rio Grande do Sul', codigo: 'RS' }, { nome: 'Santa Catarina', codigo: 'SC' }]
     };
   
-    let estados = regioes[id] || [];
+    let estados =(id != null)   ? regioes[id] : regioes['1'].concat(regioes['2'], regioes['3'], regioes['4'], regioes['5']);
     if (ordem === 'desc') {
       estados = estados.sort((a, b) => b.nome.localeCompare(a.nome));
     } else {
